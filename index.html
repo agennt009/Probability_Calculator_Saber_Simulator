@@ -210,7 +210,7 @@
           <div class="grid" id="dailyOutput">
             <div class="box daily">
               <div class="title">Result</div>
-              <div class="value">0.000 K</div>
+              <div class="value">0.000</div>
             </div>
           </div>
 
@@ -289,31 +289,50 @@
       timeBox.textContent = formatDuration(totalMinutes);
     }
 
-    const suffixes = [
+    // Custom suffix list
+    const baseSuffixes = [
       "", "K", "M", "B", "t", "q", "Q", "s", "S", "o", "n", "d", "U", "D", "T",
       "Qt", "Qd", "Sd", "St", "O", "N", "v", "c"
     ];
 
+    const suffixes = [...baseSuffixes];
+
+    // k + 1 letter (ka..kz)
     for (let i = 0; i < 26; i++) {
       suffixes.push("k" + String.fromCharCode(97 + i));
     }
+    // k + 2 letters (kaa..kzz)
     for (let i = 0; i < 26; i++) {
       for (let j = 0; j < 26; j++) {
         suffixes.push("k" + String.fromCharCode(97 + i) + String.fromCharCode(97 + j));
       }
     }
+    // k + 3 letters (kaaa..kzzz)
+    for (let i = 0; i < 26; i++) {
+      for (let j = 0; j < 26; j++) {
+        for (let k = 0; k < 26; k++) {
+          suffixes.push(
+            "k" +
+            String.fromCharCode(97 + i) +
+            String.fromCharCode(97 + j) +
+            String.fromCharCode(97 + k)
+          );
+        }
+      }
+    }
 
     function parseCustomNumber(input) {
       const trimmed = (input || "").trim();
-      if (!trimmed.includes(" ")) return null;
+      if (!trimmed) return null;
 
-      const [numPart, suffix] = trimmed.split(" ");
-      if (!suffix) return null;
+      // allow "800 kbe" or "800kbe"
+      const match = trimmed.match(/^([0-9]+(?:\.[0-9]+)?)\s*([A-Za-z]*)$/);
+      if (!match) return null;
 
-      const cleanNum = numPart.replace(/,/g, "");
-      const value = Number(cleanNum);
+      const value = Number(match[1]);
       if (!isFinite(value)) return null;
 
+      const suffix = match[2] || "";
       const index = suffixes.indexOf(suffix);
       if (index === -1) return null;
 
@@ -321,7 +340,7 @@
     }
 
     function formatCustomNumber(value) {
-      if (!isFinite(value)) return "Invalid";
+      if (!isFinite(value)) return "Invalid input";
       if (value === 0) return "0.000";
 
       let index = 0;
