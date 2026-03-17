@@ -34,9 +34,16 @@
       padding: 32px 16px;
     }
 
-    .card {
+    .page {
       width: 100%;
       max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card {
+      width: 100%;
       background: linear-gradient(180deg, #121a26 0%, #0f1622 100%);
       border: 1px solid var(--border);
       border-radius: 16px;
@@ -133,75 +140,83 @@
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Chest Chance Calculator</h1>
+  <div class="page">
+    <div class="card">
+      <h1>Chest Chance Calculator</h1>
 
-    <div class="split">
-      <section>
-        <div class="section-title">At Least One Chest</div>
-        <div class="input-row">
-          <div>
-            <label for="difficulty">Difficulty</label>
-            <select id="difficulty">
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-              <option value="impossible">Impossible</option>
-            </select>
+      <div class="split">
+        <section>
+          <div class="section-title">At Least One Chest</div>
+          <div class="input-row">
+            <div>
+              <label for="difficulty">Difficulty</label>
+              <select id="difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+                <option value="impossible">Impossible</option>
+              </select>
+            </div>
+            <div>
+              <label for="runs">Number of runs</label>
+              <input id="runs" type="number" min="0" value="0" />
+            </div>
           </div>
-          <div>
-            <label for="runs">Number of runs</label>
-            <input id="runs" type="number" min="0" value="0" />
+
+          <div class="grid" id="output"></div>
+
+          <div class="note">Formula: 1 - (1 - p)^n</div>
+          <div class="note"><strong>*NOTE This is just a probability calculator and no chances are 100% guaranteed.</strong></div>
+        </section>
+
+        <section>
+          <div class="section-title">Time to Complete Runs</div>
+          <div class="input-row">
+            <div>
+              <label for="runsTime">Number of runs</label>
+              <input id="runsTime" type="number" min="0" value="0" />
+            </div>
           </div>
-        </div>
 
-        <div class="grid" id="output"></div>
-
-        <div class="note">Formula: 1 - (1 - p)^n</div>
-        <div class="note"><strong>*NOTE This is just a probability calculator and no chances are 100% guaranteed.</strong></div>
-      </section>
-
-      <section>
-        <div class="section-title">Time to Complete Runs</div>
-        <div class="input-row">
-          <div>
-            <label for="runsTime">Number of runs</label>
-            <input id="runsTime" type="number" min="0" value="0" />
+          <div class="grid" id="timeOutput">
+            <div class="box shiny">
+              <div class="title">Estimated Time</div>
+              <div class="value">0 minutes</div>
+            </div>
           </div>
-        </div>
 
-        <div class="grid" id="timeOutput">
-          <div class="box shiny">
-            <div class="title">Estimated Time</div>
-            <div class="value">0 minutes</div>
+          <div class="note">Assumes 1 run every 15 minutes (4 per hour, 96 per day).</div>
+        </section>
+      </div>
+    </div>
+
+    <div class="card">
+      <h1>Dailies/Dungeon Calculation</h1>
+
+      <div class="split">
+        <section>
+          <div class="section-title">Dailies Calculator</div>
+          <div class="input-row">
+            <div>
+              <label for="dailyValue">Base value (e.g. 800 kbe)</label>
+              <input id="dailyValue" type="text" placeholder="800 kbe" />
+            </div>
+            <div>
+              <label for="dailyCount">Number of dailies</label>
+              <input id="dailyCount" type="number" min="0" value="0" />
+            </div>
           </div>
-        </div>
 
-        <div class="note">Assumes 1 run every 15 minutes (4 per hour, 96 per day).</div>
-      </section>
-
-      <section>
-        <div class="section-title">Dailies Calculator</div>
-        <div class="input-row">
-          <div>
-            <label for="dailyValue">Base value (e.g. 800 kbe)</label>
-            <input id="dailyValue" type="text" placeholder="800 kbe" />
+          <div class="grid" id="dailyOutput">
+            <div class="box daily">
+              <div class="title">Result</div>
+              <div class="value">0.000 K</div>
+            </div>
           </div>
-          <div>
-            <label for="dailyCount">Number of dailies</label>
-            <input id="dailyCount" type="number" min="0" value="0" />
-          </div>
-        </div>
 
-        <div class="grid" id="dailyOutput">
-          <div class="box daily">
-            <div class="title">Result</div>
-            <div class="value">0.000 K</div>
-          </div>
-        </div>
-
-        <div class="note">Multiplier per daily: 3.062888049375×</div>
-      </section>
+          <div class="note">Multiplier per daily: 3.062888049375×</div>
+        </section>
+      </div>
     </div>
   </div>
 
@@ -274,17 +289,14 @@
       timeBox.textContent = formatDuration(totalMinutes);
     }
 
-    // Custom number system
     const suffixes = [
       "", "K", "M", "B", "t", "q", "Q", "s", "S", "o", "n", "d", "U", "D", "T",
       "Qt", "Qd", "Sd", "St", "O", "N", "v", "c"
     ];
 
-    // ka..kz
     for (let i = 0; i < 26; i++) {
       suffixes.push("k" + String.fromCharCode(97 + i));
     }
-    // kaa..kzz
     for (let i = 0; i < 26; i++) {
       for (let j = 0; j < 26; j++) {
         suffixes.push("k" + String.fromCharCode(97 + i) + String.fromCharCode(97 + j));
