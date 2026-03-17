@@ -57,10 +57,10 @@
       letter-spacing: 0.3px;
     }
 
-    label {
+    label, .bold-label {
       display: block;
       margin-bottom: 6px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text);
     }
 
@@ -219,6 +219,28 @@
           </div>
 
           <div class="note">Multiplier per daily: 3.062888049375×</div>
+
+          <div style="margin-top: 18px;">
+            <div class="bold-label">Current Coins/Crowns:</div>
+            <div class="input-row">
+              <input id="currentCoins" type="text" placeholder="20.34 kbc" />
+              <div>
+                <div class="bold-label">Goal Coins/Crowns:</div>
+                <input id="goalCoins" type="text" placeholder="300.33 kbe" />
+              </div>
+            </div>
+
+            <div class="grid" id="goalOutput">
+              <div class="box daily">
+                <div class="title">Dailies Needed</div>
+                <div class="value" id="goalDailies">0</div>
+              </div>
+              <div class="box daily">
+                <div class="title">Estimated Time</div>
+                <div class="value" id="goalTime">0 hours</div>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
     </div>
@@ -421,15 +443,44 @@
       document.getElementById("dailyTime").textContent = formatDailyTime(dailyCount);
     }
 
+    function updateGoal() {
+      const current = parseCustomNumberLog(document.getElementById("currentCoins").value);
+      const goal = parseCustomNumberLog(document.getElementById("goalCoins").value);
+
+      const dailiesBox = document.getElementById("goalDailies");
+      const timeBox = document.getElementById("goalTime");
+
+      if (current === null || goal === null) {
+        dailiesBox.textContent = "Invalid input";
+        timeBox.textContent = "Invalid input";
+        return;
+      }
+
+      if (goal <= current) {
+        dailiesBox.textContent = "0";
+        timeBox.textContent = "0 hours";
+        return;
+      }
+
+      const logMultiplier = Math.log10(3.062888049375);
+      const needed = Math.ceil((goal - current) / logMultiplier);
+
+      dailiesBox.textContent = String(needed);
+      timeBox.textContent = formatDailyTime(needed);
+    }
+
     document.getElementById("runs").addEventListener("input", update);
     document.getElementById("difficulty").addEventListener("change", update);
     document.getElementById("runsTime").addEventListener("input", updateTime);
     document.getElementById("dailyValue").addEventListener("input", updateDailies);
     document.getElementById("dailyCount").addEventListener("input", updateDailies);
+    document.getElementById("currentCoins").addEventListener("input", updateGoal);
+    document.getElementById("goalCoins").addEventListener("input", updateGoal);
 
     update();
     updateTime();
     updateDailies();
+    updateGoal();
   </script>
 </body>
 </html>
