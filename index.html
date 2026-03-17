@@ -17,6 +17,7 @@
       --shiny: #a7b0bb;
       --rainbow: #ff6ad5;
       --void: #7a4bff;
+      --daily: #64d7ff;
     }
 
     * { box-sizing: border-box; }
@@ -35,7 +36,7 @@
 
     .card {
       width: 100%;
-      max-width: 1100px;
+      max-width: 1200px;
       background: linear-gradient(180deg, #121a26 0%, #0f1622 100%);
       border: 1px solid var(--border);
       border-radius: 16px;
@@ -108,6 +109,7 @@
     .shiny { border-color: var(--shiny); box-shadow: 0 0 0 1px rgba(167,176,187,0.2); }
     .rainbow { border-color: var(--rainbow); box-shadow: 0 0 0 1px rgba(255,106,213,0.25), 0 0 12px rgba(255,106,213,0.25); }
     .void { border-color: var(--void); box-shadow: 0 0 0 1px rgba(122,75,255,0.25), 0 0 12px rgba(122,75,255,0.25); }
+    .daily { border-color: var(--daily); box-shadow: 0 0 0 1px rgba(100,215,255,0.25), 0 0 12px rgba(100,215,255,0.25); }
 
     .note {
       margin-top: 14px;
@@ -156,7 +158,7 @@
         <div class="grid" id="output"></div>
 
         <div class="note">Formula: 1 - (1 - p)^n</div>
-        <div class="note"><strong>*NOTE This is just a Probability Calculator and no Chances are 100% guarantee</strong></div>
+        <div class="note"><strong>*NOTE This is just a probability calculator and no chances are 100% guaranteed.</strong></div>
       </section>
 
       <section>
@@ -176,6 +178,29 @@
         </div>
 
         <div class="note">Assumes 1 run every 15 minutes (4 per hour, 96 per day).</div>
+      </section>
+
+      <section>
+        <div class="section-title">Dailies Calculator</div>
+        <div class="input-row">
+          <div>
+            <label for="dailyValue">Base value (e.g. 800 kbe)</label>
+            <input id="dailyValue" type="text" placeholder="800 kbe" />
+          </div>
+          <div>
+            <label for="dailyCount">Number of dailies</label>
+            <input id="dailyCount" type="number" min="0" value="0" />
+          </div>
+        </div>
+
+        <div class="grid" id="dailyOutput">
+          <div class="box daily">
+            <div class="title">Result</div>
+            <div class="value">0.000 K</div>
+          </div>
+        </div>
+
+        <div class="note">Multiplier per daily: 3.062888049375×</div>
       </section>
     </div>
   </div>
@@ -249,12 +274,83 @@
       timeBox.textContent = formatDuration(totalMinutes);
     }
 
+    // Custom number system
+    const suffixes = [
+      "", "K", "M", "B", "t", "q", "Q", "s", "S", "o", "n", "d", "U", "D", "T",
+      "Qt", "Qd", "Sd", "St", "O", "N", "v", "c"
+    ];
+
+    // ka..kz
+    for (let i = 0; i < 26; i++) {
+      suffixes.push("k" + String.fromCharCode(97 + i));
+    }
+    // kaa..kzz
+    for (let i = 0; i < 26; i++) {
+      for (let j = 0; j < 26; j++) {
+        suffixes.push("k" + String.fromCharCode(97 + i) + String.fromCharCode(97 + j));
+      }
+    }
+
+    function parseCustomNumber(input) {
+      const trimmed = (input || "").trim();
+      if (!trimmed.includes(" ")) return null;
+
+      const [numPart, suffix] = trimmed.split(" ");
+      if (!suffix) return null;
+
+      const cleanNum = numPart.replace(/,/g, "");
+      const value = Number(cleanNum);
+      if (!isFinite(value)) return null;
+
+      const index = suffixes.indexOf(suffix);
+      if (index === -1) return null;
+
+      return value * Math.pow(1000, index);
+    }
+
+    function formatCustomNumber(value) {
+      if (!isFinite(value)) return "Invalid";
+      if (value === 0) return "0.000";
+
+      let index = 0;
+      let v = value;
+
+      while (v >= 1000 && index < suffixes.length - 1) {
+        v /= 1000;
+        index++;
+      }
+
+      const formatted = v.toFixed(3);
+      const suffix = suffixes[index];
+      return suffix ? `${formatted} ${suffix}` : formatted;
+    }
+
+    function updateDailies() {
+      const baseInput = document.getElementById("dailyValue").value;
+      const dailyCount = Math.max(0, Number(document.getElementById("dailyCount").value || 0));
+
+      const baseValue = parseCustomNumber(baseInput);
+      const output = document.querySelector("#dailyOutput .box .value");
+
+      if (baseValue === null) {
+        output.textContent = "Invalid input";
+        return;
+      }
+
+      const multiplier = Math.pow(3.062888049375, dailyCount);
+      const result = baseValue * multiplier;
+      output.textContent = formatCustomNumber(result);
+    }
+
     document.getElementById("runs").addEventListener("input", update);
     document.getElementById("difficulty").addEventListener("change", update);
     document.getElementById("runsTime").addEventListener("input", updateTime);
+    document.getElementById("dailyValue").addEventListener("input", updateDailies);
+    document.getElementById("dailyCount").addEventListener("input", updateDailies);
 
     update();
     updateTime();
+    updateDailies();
   </script>
 </body>
 </html>
