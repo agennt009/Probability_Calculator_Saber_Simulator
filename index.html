@@ -737,6 +737,13 @@
       return parts.join(", ");
     }
 
+    const SIM_CHUNK_SIZE = 20000;
+    let hatchRunId = 0;
+
+    function nextFrame(){
+      return new Promise(resolve => requestAnimationFrame(resolve));
+    }
+
 
     function getCategory(fast, auto){
       if(fast && auto) return "p2w_auto";
@@ -1163,7 +1170,7 @@
       return weights.length - 1;
     }
 
-    function simulateAccount(account, calcMode, timeSeconds, targetEggs){
+    async function simulateAccountAsync(account, calcMode, timeSeconds, targetEggs, runId){
       let eggsPerSlot = 0;
       let totalTime = 0;
 
@@ -1251,6 +1258,11 @@
         }
 
         variantCounts[rarityKey][variant] += 1;
+
+        if(i % SIM_CHUNK_SIZE === 0 && i > 0){
+          if(runId !== hatchRunId) return null;
+          await nextFrame();
+        }
       }
 
       const totalEggs = simEggs;
@@ -1290,7 +1302,8 @@
       `;
     }
 
-    function updateHatch(){
+    async function updateHatch(){
+      const runId = ++hatchRunId;
       const calcMode = getCalcMode();
       const resultMode = getResultMode();
       const same = document.getElementById("sameAccounts").checked;
@@ -1316,10 +1329,12 @@
       const blocks = same ? 1 : accountCount;
 
       for(let i=0;i<blocks;i++){
+        if(runId !== hatchRunId) return;
         const acc = getAccountSettings(i);
         const result = (resultMode === "simulation")
-          ? simulateAccount(acc, calcMode, timeSeconds, targetEggs)
+          ? await simulateAccountAsync(acc, calcMode, timeSeconds, targetEggs, runId)
           : computeAccountDeterministic(acc, calcMode, timeSeconds, targetEggs);
+        if(!result || runId !== hatchRunId) return;
 
         const multiplier = same ? accountCount : 1;
         totalEggs += result.totalEggs * multiplier;
