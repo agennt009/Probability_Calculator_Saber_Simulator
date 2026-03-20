@@ -13,6 +13,7 @@
       --muted: #9db0c8;
       --input: #0f1622;
       --border: #223047;
+      --bg-image: url("assets/saber-bg.jpg");
 
       --gold: #f6c453;
       --shiny: #a7b0bb;
@@ -28,10 +29,38 @@
     body {
       margin: 0;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(1200px 600px at 20% -10%, #1a2440 0%, #0b0f14 50%, #090c10 100%);
+      background: #0b0f14;
       color: var(--text);
       min-height: 100vh;
       padding: 24px 16px 48px;
+      position: relative;
+      overflow-x: hidden;
+      isolation: isolate;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -32px;
+      background-image: var(--bg-image);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: blur(42px) saturate(1.08) brightness(0.88);
+      transform: scale(1.12);
+      opacity: 0.88;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(26,36,64,0.62) 0%, rgba(11,15,20,0.78) 50%, rgba(9,12,16,0.9) 100%);
+      z-index: -1;
+      pointer-events: none;
     }
 
     .page {
