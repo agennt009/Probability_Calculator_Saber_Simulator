@@ -208,6 +208,84 @@
 
     .hidden { display: none !important; }
 
+    .toggle-group {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toggle-btn {
+      border: 1px solid var(--border);
+      background: #0f1622;
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .toggle-btn.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(111,225,255,0.25), 0 0 12px rgba(111,225,255,0.25);
+    }
+
+    .checkline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .checkline input {
+      width: auto;
+    }
+
+    .account-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .account-title {
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: right;
+    }
+
+    .data-table th:first-child,
+    .data-table td:first-child {
+      text-align: left;
+    }
+
+    .data-table th {
+      background: #0f1622;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.75rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
     /* Pet Index */
     .pet-section-title {
       margin: 18px 0 8px;
@@ -270,6 +348,7 @@
     <div class="nav">
       <button class="tab active" data-target="home">Home</button>
       <button class="tab" data-target="dungeon">Dungeon</button>
+      <button class="tab" data-target="hatch">Hatch Calculator</button>
       <button class="tab" data-target="pet-index">Pet Index</button>
       <button class="tab" data-target="dailies">Dailies</button>
     </div>
@@ -348,6 +427,99 @@
       </div>
     </section>
 
+    <!-- HATCH -->
+    <section id="hatch" class="card hidden">
+      <h1>Hatch Calculator</h1>
+      <div class="split">
+        <section>
+          <div class="section-title">Mode & Time</div>
+          <div class="input-row">
+            <div>
+              <label>Calculation Mode</label>
+              <div class="toggle-group" id="calcMode">
+                <button class="toggle-btn active" data-value="time">From Time</button>
+                <button class="toggle-btn" data-value="eggs">From Eggs</button>
+              </div>
+            </div>
+            <div>
+              <label>Result Mode</label>
+              <div class="toggle-group" id="resultMode">
+                <button class="toggle-btn active" data-value="deterministic">Deterministic</button>
+                <button class="toggle-btn" data-value="simulation">Simulation</button>
+              </div>
+            </div>
+          </div>
+          <div class="input-row">
+            <div>
+              <label for="accountCount">Accounts</label>
+              <input id="accountCount" type="number" min="1" max="20" value="1" />
+            </div>
+            <div class="checkline">
+              <input id="sameAccounts" type="checkbox" checked />
+              <label for="sameAccounts">Use same settings for all accounts</label>
+            </div>
+          </div>
+          <div class="input-row" id="timeInputs">
+            <div>
+              <label for="timeDays">Days</label>
+              <input id="timeDays" type="number" min="0" value="0" />
+            </div>
+            <div>
+              <label for="timeHours">Hours</label>
+              <input id="timeHours" type="number" min="0" value="1" />
+            </div>
+            <div>
+              <label for="timeMinutes">Minutes</label>
+              <input id="timeMinutes" type="number" min="0" value="0" />
+            </div>
+            <div>
+              <label for="timeSeconds">Seconds</label>
+              <input id="timeSeconds" type="number" min="0" value="0" />
+            </div>
+          </div>
+          <div class="input-row hidden" id="eggInputs">
+            <div>
+              <label for="targetEggs">Target Eggs</label>
+              <input id="targetEggs" type="number" min="0" value="100000" />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-title">Account Settings</div>
+          <div id="accountsContainer"></div>
+        </section>
+      </div>
+
+      <div class="section-title" style="margin-top: 18px;">Results</div>
+      <div class="grid" id="hatchSummary">
+        <div class="box shiny">
+          <div class="title">Total Eggs</div>
+          <div class="value" id="summaryEggs">0</div>
+        </div>
+        <div class="box shiny">
+          <div class="title">Total Time</div>
+          <div class="value" id="summaryTime">0 minutes</div>
+        </div>
+        <div class="box shiny">
+          <div class="title">Eggs per Account</div>
+          <div class="value" id="summaryPerAccount">0</div>
+        </div>
+      </div>
+      <div class="note" id="hatchNote"></div>
+
+      <div class="split" style="margin-top: 18px;">
+        <section>
+          <div class="section-title">Rarity Chances & Expected Counts</div>
+          <div class="table-wrap" id="rarityTableWrap"></div>
+        </section>
+        <section>
+          <div class="section-title">Variant Expected Counts (by Rarity)</div>
+          <div class="table-wrap" id="variantTableWrap"></div>
+        </section>
+      </div>
+    </section>
+
     <!-- PET INDEX -->
     <section id="pet-index" class="card hidden">
       <h1>Pet Index</h1>
@@ -413,7 +585,7 @@
   <script>
     // Tabs
     const tabs = document.querySelectorAll(".tab");
-    const sections = ["home","dungeon","pet-index","dailies"].map(id => document.getElementById(id));
+    const sections = ["home","dungeon","hatch","pet-index","dailies"].map(id => document.getElementById(id));
     function showSection(id){
       sections.forEach(s=>s.classList.add("hidden"));
       document.getElementById(id).classList.remove("hidden");
@@ -462,6 +634,748 @@
     document.getElementById("difficulty").addEventListener("change", updateDungeon);
     document.getElementById("runsTime").addEventListener("input", updateTime);
     updateDungeon(); updateTime();
+
+    // Hatch Calculator
+    const HATCH_TIMES = {
+      f2p_no_auto: {
+        egg: { normal: 3.633, moon1: 5.035, moon2: 6.077, moon3: 6.955 },
+        anim: { normal: 2.508, moon1: 3.460, moon2: 4.172, moon3: 5.185 }
+      },
+      f2p_auto: {
+        egg: { normal: 3.533, moon1: 4.900, moon2: 6.047, moon3: 6.920 },
+        anim: { normal: 2.521, moon1: 3.443, moon2: 4.151, moon3: 5.159 }
+      },
+      p2w_no_auto: {
+        egg: { normal: 1.636, moon1: 2.268, moon2: 2.737, moon3: 3.133 },
+        anim: { normal: 1.130, moon1: 1.559, moon2: 1.879, moon3: 2.336 }
+      },
+      p2w_auto: {
+        egg: { normal: 1.591, moon1: 2.207, moon2: 2.724, moon3: 3.117 },
+        anim: { normal: 1.136, moon1: 1.551, moon2: 1.870, moon3: 2.324 }
+      }
+    };
+
+    const BASE_RARITY = {
+      star1: 0.29,
+      star2: 0.25,
+      star3: 0.20,
+      star4: 0.1078,
+      star4b: 0.08,
+      star5: 0.05,
+      moon1: 0.02,
+      moon2: 0.002,
+      moon3: 0.0002,
+      sun: 0.000000005
+    };
+
+    const RARITY_LIST = [
+      { key: "star1", label: "1 Star" },
+      { key: "star2", label: "2 Star" },
+      { key: "star3", label: "3 Star" },
+      { key: "star4", label: "4 Star" },
+      { key: "star4b", label: "4 Star (2nd)" },
+      { key: "star5", label: "5 Star" },
+      { key: "moon1", label: "1 Moon" },
+      { key: "moon2", label: "2 Moon" },
+      { key: "moon3", label: "3 Moon" },
+      { key: "sun", label: "Sun" }
+    ];
+
+    const VARIANT_BASE = {
+      normal: 0.8889,
+      golden: 0.1,
+      shiny: 0.01,
+      rainbow: 0.001,
+      void: 0.0001
+    };
+
+    function clamp(val, min, max){
+      return Math.min(max, Math.max(min, val));
+    }
+
+    function roundEvenDown(val){
+      if(!isFinite(val) || val <= 0) return 0;
+      let f = Math.floor(val);
+      if(f % 2 !== 0) f -= 1;
+      return Math.max(0, f);
+    }
+
+    function formatNumber(val, decimals=2){
+      if(!isFinite(val)) return "0";
+      return val.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function formatPercent(val){
+      return (val*100).toFixed(6) + "%";
+    }
+
+    function formatDurationSeconds(totalSeconds){
+      let seconds = Math.max(0, Math.floor(totalSeconds));
+      const days = Math.floor(seconds / 86400); seconds -= days * 86400;
+      const hours = Math.floor(seconds / 3600); seconds -= hours * 3600;
+      const minutes = Math.floor(seconds / 60); seconds -= minutes * 60;
+      const parts = [];
+      if(days > 0) parts.push(`${days} day${days===1?"":"s"}`);
+      if(hours > 0) parts.push(`${hours} hour${hours===1?"":"s"}`);
+      if(minutes > 0) parts.push(`${minutes} minute${minutes===1?"":"s"}`);
+      if(seconds > 0 || parts.length === 0) parts.push(`${seconds} second${seconds===1?"":"s"}`);
+      return parts.join(", ");
+    }
+
+
+    function getCategory(fast, auto){
+      if(fast && auto) return "p2w_auto";
+      if(fast && !auto) return "p2w_no_auto";
+      if(!fast && auto) return "f2p_auto";
+      return "f2p_no_auto";
+    }
+
+    function masteryMultiplier(level, isP2W){
+      const lvl = Math.max(1, Math.min(50, Math.floor(level || 1)));
+      if(lvl >= 50) return isP2W ? 1.0 : 0.89;
+      if(lvl >= 40) return isP2W ? 1.05 : 0.94;
+      if(lvl >= 30) return isP2W ? 1.08 : 0.97;
+      if(lvl >= 20) return isP2W ? 1.10 : 0.99;
+      return isP2W ? 1.11 : 1.0;
+    }
+
+    function computeRarityProbabilities(luck){
+      const base = BASE_RARITY;
+      const m1 = base.moon1 * luck;
+      const m2 = base.moon2 * luck;
+      const m3 = base.moon3 * luck;
+      const sun = base.sun * luck;
+      const baseMoonSum = base.moon1 + base.moon2 + base.moon3 + base.sun;
+      const newMoonSum = m1 + m2 + m3 + sun;
+      const increase = newMoonSum - baseMoonSum;
+      let star1 = base.star1 - increase;
+
+      let adjM1 = m1;
+      let adjM2 = m2;
+      let adjM3 = m3;
+      let adjSun = sun;
+
+      if(star1 < 0){
+        const maxIncrease = base.star1;
+        const scale = maxIncrease / increase;
+        adjM1 = base.moon1 + (m1 - base.moon1) * scale;
+        adjM2 = base.moon2 + (m2 - base.moon2) * scale;
+        adjM3 = base.moon3 + (m3 - base.moon3) * scale;
+        adjSun = base.sun + (sun - base.sun) * scale;
+        star1 = 0;
+      }
+
+      const probs = {
+        star1: star1,
+        star2: base.star2,
+        star3: base.star3,
+        star4: base.star4,
+        star4b: base.star4b,
+        star5: base.star5,
+        moon1: adjM1,
+        moon2: adjM2,
+        moon3: adjM3,
+        sun: adjSun
+      };
+
+      const total = Object.values(probs).reduce((a,b)=>a+b,0);
+      if(total > 0){
+        Object.keys(probs).forEach(k => probs[k] = probs[k] / total);
+      }
+      return probs;
+    }
+
+    function expectedTimes(category, masteryMult, probs){
+      const times = HATCH_TIMES[category];
+      const pNormal = probs.star1 + probs.star2 + probs.star3 + probs.star4 + probs.star4b + probs.star5;
+      const p1 = probs.moon1;
+      const p2 = probs.moon2;
+      const p3 = probs.moon3;
+      const pS = probs.sun;
+      const sunEgg = times.egg.moon3 * 1.15;
+      const sunAnim = times.anim.moon3 * 1.15;
+      const egg = (pNormal * times.egg.normal + p1 * times.egg.moon1 + p2 * times.egg.moon2 + p3 * times.egg.moon3 + pS * sunEgg) * masteryMult;
+      const anim = (pNormal * times.anim.normal + p1 * times.anim.moon1 + p2 * times.anim.moon2 + p3 * times.anim.moon3 + pS * sunAnim) * masteryMult;
+      return { Eegg: egg, Eanim: anim };
+    }
+
+    function eggsInTimeConstant(timeSeconds, Eegg, Eanim){
+      const n = Math.floor(timeSeconds / Eegg);
+      const base = n * Eegg;
+      const rest = timeSeconds - base;
+      const frac = rest / Eanim;
+      return n + frac;
+    }
+
+    function eggsInTimeSegments(timeSeconds, segments){
+      let remainingTime = timeSeconds;
+      let eggs = 0;
+      for(const seg of segments){
+        if(remainingTime <= 0) break;
+        if(!isFinite(seg.eggs)){
+          eggs += eggsInTimeConstant(remainingTime, seg.Eegg, seg.Eanim);
+          remainingTime = 0;
+          break;
+        }
+        const timeAll = seg.eggs * seg.Eegg;
+        if(remainingTime >= timeAll){
+          eggs += seg.eggs;
+          remainingTime -= timeAll;
+        } else {
+          eggs += eggsInTimeConstant(remainingTime, seg.Eegg, seg.Eanim);
+          remainingTime = 0;
+          break;
+        }
+      }
+      return eggs;
+    }
+
+    function timeForEggsSegments(eggs, segments){
+      let remaining = eggs;
+      let time = 0;
+      for(const seg of segments){
+        if(remaining <= 0) break;
+        if(!isFinite(seg.eggs)){
+          if(remaining <= 1){
+            time += seg.Eanim;
+          } else {
+            time += (remaining - 1) * seg.Eegg + seg.Eanim;
+          }
+          remaining = 0;
+          break;
+        }
+        if(remaining > seg.eggs){
+          time += seg.eggs * seg.Eegg;
+          remaining -= seg.eggs;
+        } else {
+          if(remaining <= 1){
+            time += seg.Eanim;
+          } else {
+            time += (remaining - 1) * seg.Eegg + seg.Eanim;
+          }
+          remaining = 0;
+          break;
+        }
+      }
+      return time;
+    }
+
+    function buildLuckSegments(eggsPerSlot, baseLuck, luckCharms, eggsPerHatch, category, masteryMult){
+      const perSlot = {
+        godly: (luckCharms.godly || 0) / eggsPerHatch,
+        ultra: (luckCharms.ultra || 0) / eggsPerHatch,
+        super: (luckCharms.super || 0) / eggsPerHatch,
+        luck: (luckCharms.luck || 0) / eggsPerHatch
+      };
+
+      const order = [
+        { count: perSlot.godly, mult: 50 },
+        { count: perSlot.ultra, mult: 15 },
+        { count: perSlot.super, mult: 5 },
+        { count: perSlot.luck, mult: 2 },
+        { count: Infinity, mult: 1 }
+      ];
+
+      let remaining = eggsPerSlot;
+      const segments = [];
+      for(const item of order){
+        if(remaining <= 0) break;
+        let segEggs = item.count;
+        if(!isFinite(segEggs)) segEggs = Infinity;
+        if(isFinite(segEggs)) segEggs = Math.min(remaining, segEggs);
+        if(segEggs <= 0) continue;
+        const probs = computeRarityProbabilities(baseLuck * item.mult);
+        const times = expectedTimes(category, masteryMult, probs);
+        segments.push({ eggs: segEggs, probs, Eegg: times.Eegg, Eanim: times.Eanim });
+        if(isFinite(segEggs)) remaining -= segEggs;
+      }
+      return segments;
+    }
+
+    function expectedRarityCounts(eggsPerSlot, segments){
+      const counts = {};
+      RARITY_LIST.forEach(r => counts[r.key] = 0);
+      let remaining = eggsPerSlot;
+      for(const seg of segments){
+        if(remaining <= 0) break;
+        const segEggs = isFinite(seg.eggs) ? Math.min(remaining, seg.eggs) : remaining;
+        RARITY_LIST.forEach(r => {
+          counts[r.key] += segEggs * seg.probs[r.key];
+        });
+        remaining -= segEggs;
+      }
+      return counts;
+    }
+
+    function averageVariantProbs(eggsPerSlot, rarityCharms, eggsPerHatch){
+      const base = { ...VARIANT_BASE };
+      let normal = base.normal;
+      const charmShiny = (rarityCharms.shiny || 0) / eggsPerHatch;
+      const charmRainbow = (rarityCharms.rainbow || 0) / eggsPerHatch;
+      const charmVoid = (rarityCharms.void || 0) / eggsPerHatch;
+
+      function applyCharm(baseVal, charmCount){
+        if(eggsPerSlot <= 0) return { avg: baseVal, inc: 0 };
+        const f = Math.min(1, charmCount / eggsPerSlot);
+        const boosted = 0.05;
+        const avg = baseVal + (boosted - baseVal) * f;
+        return { avg, inc: avg - baseVal };
+      }
+
+      const shiny = applyCharm(base.shiny, charmShiny);
+      const rainbow = applyCharm(base.rainbow, charmRainbow);
+      const voidv = applyCharm(base.void, charmVoid);
+
+      normal -= shiny.inc + rainbow.inc + voidv.inc;
+      normal = Math.max(0, normal);
+
+      return {
+        normal,
+        golden: base.golden,
+        shiny: shiny.avg,
+        rainbow: rainbow.avg,
+        void: voidv.avg
+      };
+    }
+
+    function buildAccountCard(index){
+      return `
+        <div class="account-card">
+          <div class="account-title">Account ${index + 1}</div>
+          <div class="input-row">
+            <div>
+              <label for="acc${index}-luck">Base Luck (x)</label>
+              <input id="acc${index}-luck" type="number" min="0" step="0.01" value="1" />
+            </div>
+            <div>
+              <label for="acc${index}-eggs">Eggs Per Hatch</label>
+              <select id="acc${index}-eggs">
+                <option value="1">1 Egg</option>
+                <option value="2">2 Eggs</option>
+                <option value="3">3 Eggs</option>
+                <option value="4">4 Eggs</option>
+                <option value="5">5 Eggs</option>
+              </select>
+            </div>
+            <div>
+              <label for="acc${index}-mastery">Mastery Level (1-50)</label>
+              <input id="acc${index}-mastery" type="number" min="1" max="50" value="50" />
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="checkline">
+              <input id="acc${index}-fast" type="checkbox" />
+              <label for="acc${index}-fast">Fast Hatch Gamepass</label>
+            </div>
+            <div class="checkline">
+              <input id="acc${index}-auto" type="checkbox" />
+              <label for="acc${index}-auto">Auto Hatch Gamepass</label>
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="checkline">
+              <input id="acc${index}-useLuckCharms" type="checkbox" />
+              <label for="acc${index}-useLuckCharms">Luck Charms</label>
+            </div>
+          </div>
+          <div class="grid hidden" id="acc${index}-luckCharms">
+            <div>
+              <label for="acc${index}-luckCharm">Luck Charm</label>
+              <input id="acc${index}-luckCharm" type="number" min="0" value="0" />
+            </div>
+            <div>
+              <label for="acc${index}-superCharm">Super Luck Charm</label>
+              <input id="acc${index}-superCharm" type="number" min="0" value="0" />
+            </div>
+            <div>
+              <label for="acc${index}-ultraCharm">Ultra Luck Charm</label>
+              <input id="acc${index}-ultraCharm" type="number" min="0" value="0" />
+            </div>
+            <div>
+              <label for="acc${index}-godlyCharm">Godly Luck Charm</label>
+              <input id="acc${index}-godlyCharm" type="number" min="0" value="0" />
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="checkline">
+              <input id="acc${index}-useRarityCharms" type="checkbox" />
+              <label for="acc${index}-useRarityCharms">Rarity Charms</label>
+            </div>
+          </div>
+          <div class="grid hidden" id="acc${index}-rarityCharms">
+            <div>
+              <label for="acc${index}-shinyCharm">Shiny Charms</label>
+              <input id="acc${index}-shinyCharm" type="number" min="0" value="0" />
+            </div>
+            <div>
+              <label for="acc${index}-rainbowCharm">Rainbow Charms</label>
+              <input id="acc${index}-rainbowCharm" type="number" min="0" value="0" />
+            </div>
+            <div>
+              <label for="acc${index}-voidCharm">Void Charms</label>
+              <input id="acc${index}-voidCharm" type="number" min="0" value="0" />
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAccounts(){
+      const container = document.getElementById("accountsContainer");
+      const count = Math.max(1, Number(document.getElementById("accountCount").value || 1));
+      const same = document.getElementById("sameAccounts").checked;
+      const blocks = same ? 1 : count;
+      container.innerHTML = Array.from({length: blocks}, (_, i) => buildAccountCard(i)).join("");
+
+      for(let i=0;i<blocks;i++){
+        const luckToggle = document.getElementById(`acc${i}-useLuckCharms`);
+        const luckGrid = document.getElementById(`acc${i}-luckCharms`);
+        const rarityToggle = document.getElementById(`acc${i}-useRarityCharms`);
+        const rarityGrid = document.getElementById(`acc${i}-rarityCharms`);
+
+        luckToggle.addEventListener("change", () => {
+          luckGrid.classList.toggle("hidden", !luckToggle.checked);
+          updateHatch();
+        });
+        rarityToggle.addEventListener("change", () => {
+          rarityGrid.classList.toggle("hidden", !rarityToggle.checked);
+          updateHatch();
+        });
+      }
+    }
+
+    function getAccountSettings(index){
+      const eggsPerHatch = Math.max(1, Math.min(5, Number(document.getElementById(`acc${index}-eggs`).value || 1)));
+      const baseLuck = Math.max(0, Number(document.getElementById(`acc${index}-luck`).value || 1));
+      const mastery = Math.max(1, Math.min(50, Number(document.getElementById(`acc${index}-mastery`).value || 1)));
+      const fast = document.getElementById(`acc${index}-fast`).checked;
+      const auto = document.getElementById(`acc${index}-auto`).checked;
+
+      const useLuckCharms = document.getElementById(`acc${index}-useLuckCharms`).checked;
+      const useRarityCharms = document.getElementById(`acc${index}-useRarityCharms`).checked;
+
+      const luckCharms = {
+        luck: useLuckCharms ? Math.max(0, Number(document.getElementById(`acc${index}-luckCharm`).value || 0)) : 0,
+        super: useLuckCharms ? Math.max(0, Number(document.getElementById(`acc${index}-superCharm`).value || 0)) : 0,
+        ultra: useLuckCharms ? Math.max(0, Number(document.getElementById(`acc${index}-ultraCharm`).value || 0)) : 0,
+        godly: useLuckCharms ? Math.max(0, Number(document.getElementById(`acc${index}-godlyCharm`).value || 0)) : 0
+      };
+
+      const rarityCharms = {
+        shiny: useRarityCharms ? Math.max(0, Number(document.getElementById(`acc${index}-shinyCharm`).value || 0)) : 0,
+        rainbow: useRarityCharms ? Math.max(0, Number(document.getElementById(`acc${index}-rainbowCharm`).value || 0)) : 0,
+        void: useRarityCharms ? Math.max(0, Number(document.getElementById(`acc${index}-voidCharm`).value || 0)) : 0
+      };
+
+      return { eggsPerHatch, baseLuck, mastery, fast, auto, luckCharms, rarityCharms };
+    }
+
+    function getCalcMode(){
+      return document.querySelector("#calcMode .toggle-btn.active").dataset.value;
+    }
+
+    function getResultMode(){
+      return document.querySelector("#resultMode .toggle-btn.active").dataset.value;
+    }
+
+    function computeEggsPerSlotForTime(account, timeSeconds){
+      const category = getCategory(account.fast, account.auto);
+      const masteryMult = masteryMultiplier(account.mastery, account.fast);
+      const baseProbs = computeRarityProbabilities(account.baseLuck);
+      const baseTimes = expectedTimes(category, masteryMult, baseProbs);
+      let eggs = eggsInTimeConstant(timeSeconds, baseTimes.Eegg, baseTimes.Eanim);
+
+      for(let i=0;i<3;i++){
+        const segments = buildLuckSegments(eggs, account.baseLuck, account.luckCharms, account.eggsPerHatch, category, masteryMult);
+        eggs = eggsInTimeSegments(timeSeconds, segments);
+      }
+      return eggs;
+    }
+
+    function computeTimeForEggs(account, eggsPerSlot){
+      const category = getCategory(account.fast, account.auto);
+      const masteryMult = masteryMultiplier(account.mastery, account.fast);
+      const segments = buildLuckSegments(eggsPerSlot, account.baseLuck, account.luckCharms, account.eggsPerHatch, category, masteryMult);
+      return timeForEggsSegments(eggsPerSlot, segments);
+    }
+
+    function computeAccountDeterministic(account, calcMode, timeSeconds, targetEggs){
+      let eggsPerSlot = 0;
+      let totalTime = 0;
+
+      if(calcMode === "time"){
+        eggsPerSlot = computeEggsPerSlotForTime(account, timeSeconds);
+        totalTime = timeSeconds;
+      } else {
+        eggsPerSlot = Math.max(0, targetEggs / account.eggsPerHatch);
+        totalTime = computeTimeForEggs(account, eggsPerSlot);
+      }
+
+      const category = getCategory(account.fast, account.auto);
+      const masteryMult = masteryMultiplier(account.mastery, account.fast);
+      const segments = buildLuckSegments(eggsPerSlot, account.baseLuck, account.luckCharms, account.eggsPerHatch, category, masteryMult);
+      const rarityCountsPerSlot = expectedRarityCounts(eggsPerSlot, segments);
+
+      const rarityCounts = {};
+      RARITY_LIST.forEach(r => {
+        rarityCounts[r.key] = rarityCountsPerSlot[r.key] * account.eggsPerHatch;
+      });
+
+      const totalEggs = eggsPerSlot * account.eggsPerHatch;
+      const variantProbs = averageVariantProbs(eggsPerSlot, account.rarityCharms, account.eggsPerHatch);
+      const variantCounts = {};
+      RARITY_LIST.forEach(r => {
+        variantCounts[r.key] = {
+          normal: rarityCounts[r.key] * variantProbs.normal,
+          golden: rarityCounts[r.key] * variantProbs.golden,
+          shiny: rarityCounts[r.key] * variantProbs.shiny,
+          rainbow: rarityCounts[r.key] * variantProbs.rainbow,
+          void: rarityCounts[r.key] * variantProbs.void
+        };
+      });
+
+      return { totalEggs, totalTime, rarityCounts, variantCounts, variantProbs };
+    }
+
+    function sampleChoice(weights){
+      const total = weights.reduce((a,b)=>a+b,0);
+      if(total <= 0) return 0;
+      let r = Math.random() * total;
+      for(let i=0;i<weights.length;i++){
+        r -= weights[i];
+        if(r <= 0) return i;
+      }
+      return weights.length - 1;
+    }
+
+    function simulateAccount(account, calcMode, timeSeconds, targetEggs){
+      let eggsPerSlot = 0;
+      let totalTime = 0;
+
+      if(calcMode === "time"){
+        eggsPerSlot = computeEggsPerSlotForTime(account, timeSeconds);
+        totalTime = timeSeconds;
+      } else {
+        eggsPerSlot = Math.max(0, targetEggs / account.eggsPerHatch);
+        totalTime = computeTimeForEggs(account, eggsPerSlot);
+      }
+
+      let simEggs = Math.floor(eggsPerSlot);
+      const frac = eggsPerSlot - simEggs;
+      if(Math.random() < frac) simEggs += 1;
+
+      const luckCounts = {
+        godly: Math.floor((account.luckCharms.godly || 0) / account.eggsPerHatch),
+        ultra: Math.floor((account.luckCharms.ultra || 0) / account.eggsPerHatch),
+        super: Math.floor((account.luckCharms.super || 0) / account.eggsPerHatch),
+        luck: Math.floor((account.luckCharms.luck || 0) / account.eggsPerHatch)
+      };
+
+      const rarityCharmCounts = {
+        shiny: Math.floor((account.rarityCharms.shiny || 0) / account.eggsPerHatch),
+        rainbow: Math.floor((account.rarityCharms.rainbow || 0) / account.eggsPerHatch),
+        void: Math.floor((account.rarityCharms.void || 0) / account.eggsPerHatch)
+      };
+
+      const pity = { shiny: 0, rainbow: 0, void: 0 };
+
+      const rarityCounts = {};
+      RARITY_LIST.forEach(r => rarityCounts[r.key] = 0);
+      const variantCounts = {};
+      RARITY_LIST.forEach(r => {
+        variantCounts[r.key] = { normal:0, golden:0, shiny:0, rainbow:0, void:0 };
+      });
+
+      for(let i=0;i<simEggs;i++){
+        let luckMult = account.baseLuck;
+        if(luckCounts.godly > 0){ luckCounts.godly -= 1; luckMult *= 50; }
+        else if(luckCounts.ultra > 0){ luckCounts.ultra -= 1; luckMult *= 15; }
+        else if(luckCounts.super > 0){ luckCounts.super -= 1; luckMult *= 5; }
+        else if(luckCounts.luck > 0){ luckCounts.luck -= 1; luckMult *= 2; }
+
+        const probs = computeRarityProbabilities(luckMult);
+        const weights = RARITY_LIST.map(r => probs[r.key]);
+        const rarityIndex = sampleChoice(weights);
+        const rarityKey = RARITY_LIST[rarityIndex].key;
+        rarityCounts[rarityKey] += 1;
+
+        let variant = "normal";
+        const active = {
+          shiny: rarityCharmCounts.shiny > 0,
+          rainbow: rarityCharmCounts.rainbow > 0,
+          void: rarityCharmCounts.void > 0
+        };
+
+        if(active.shiny){ rarityCharmCounts.shiny -= 1; pity.shiny += 1; }
+        if(active.rainbow){ rarityCharmCounts.rainbow -= 1; pity.rainbow += 1; }
+        if(active.void){ rarityCharmCounts.void -= 1; pity.void += 1; }
+
+        if(active.void && pity.void >= 25){
+          variant = "void"; pity.void = 0;
+        } else if(active.rainbow && pity.rainbow >= 25){
+          variant = "rainbow"; pity.rainbow = 0;
+        } else if(active.shiny && pity.shiny >= 25){
+          variant = "shiny"; pity.shiny = 0;
+        } else {
+          const hitVoid = active.void && Math.random() < 0.05;
+          const hitRainbow = active.rainbow && Math.random() < 0.05;
+          const hitShiny = active.shiny && Math.random() < 0.05;
+
+          if(hitVoid){ variant = "void"; pity.void = 0; }
+          else if(hitRainbow){ variant = "rainbow"; pity.rainbow = 0; }
+          else if(hitShiny){ variant = "shiny"; pity.shiny = 0; }
+          else {
+            const vweights = [VARIANT_BASE.normal, VARIANT_BASE.golden, VARIANT_BASE.shiny, VARIANT_BASE.rainbow, VARIANT_BASE.void];
+            const vIndex = sampleChoice(vweights);
+            variant = ["normal","golden","shiny","rainbow","void"][vIndex];
+            if(active.shiny && variant === "shiny") pity.shiny = 0;
+            if(active.rainbow && variant === "rainbow") pity.rainbow = 0;
+            if(active.void && variant === "void") pity.void = 0;
+          }
+        }
+
+        variantCounts[rarityKey][variant] += 1;
+      }
+
+      const totalEggs = simEggs * account.eggsPerHatch;
+      Object.keys(rarityCounts).forEach(k => { rarityCounts[k] *= account.eggsPerHatch; });
+      Object.keys(variantCounts).forEach(k => {
+        Object.keys(variantCounts[k]).forEach(v => { variantCounts[k][v] *= account.eggsPerHatch; });
+      });
+
+      return { totalEggs, totalTime, rarityCounts, variantCounts, variantProbs: VARIANT_BASE };
+    }
+
+    function renderRarityTable(counts, totalEggs){
+      const rows = RARITY_LIST.map(r => {
+        const chance = totalEggs > 0 ? counts[r.key] / totalEggs : 0;
+        const count = roundEvenDown(counts[r.key]);
+        return `<tr><td>${r.label}</td><td>${formatPercent(chance)}</td><td>${count.toLocaleString()}</td></tr>`;
+      }).join("");
+      return `
+        <table class="data-table">
+          <thead><tr><th>Rarity</th><th>Chance</th><th>Expected</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderVariantTable(variantCounts){
+      const rows = RARITY_LIST.map(r => {
+        const v = variantCounts[r.key];
+        const n = roundEvenDown(v.normal);
+        const g = roundEvenDown(v.golden);
+        const s = roundEvenDown(v.shiny);
+        const rb = roundEvenDown(v.rainbow);
+        const vd = roundEvenDown(v.void);
+        return `<tr><td>${r.label}</td><td>${n.toLocaleString()}</td><td>${g.toLocaleString()}</td><td>${s.toLocaleString()}</td><td>${rb.toLocaleString()}</td><td>${vd.toLocaleString()}</td></tr>`;
+      }).join("");
+      return `
+        <table class="data-table">
+          <thead><tr><th>Rarity</th><th>Normal</th><th>Golden</th><th>Shiny</th><th>Rainbow</th><th>Void</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function updateHatch(){
+      const calcMode = getCalcMode();
+      const resultMode = getResultMode();
+      const same = document.getElementById("sameAccounts").checked;
+      const accountCount = Math.max(1, Number(document.getElementById("accountCount").value || 1));
+
+      const timeSeconds =
+        Math.max(0, Number(document.getElementById("timeDays").value || 0)) * 86400 +
+        Math.max(0, Number(document.getElementById("timeHours").value || 0)) * 3600 +
+        Math.max(0, Number(document.getElementById("timeMinutes").value || 0)) * 60 +
+        Math.max(0, Number(document.getElementById("timeSeconds").value || 0));
+
+      const targetEggs = Math.max(0, Number(document.getElementById("targetEggs").value || 0));
+
+      let totalEggs = 0;
+      let totalTime = 0;
+      let totalRarityCounts = {};
+      let totalVariantCounts = {};
+      RARITY_LIST.forEach(r => {
+        totalRarityCounts[r.key] = 0;
+        totalVariantCounts[r.key] = { normal:0, golden:0, shiny:0, rainbow:0, void:0 };
+      });
+
+      const blocks = same ? 1 : accountCount;
+
+      for(let i=0;i<blocks;i++){
+        const acc = getAccountSettings(i);
+        const result = (resultMode === "simulation")
+          ? simulateAccount(acc, calcMode, timeSeconds, targetEggs)
+          : computeAccountDeterministic(acc, calcMode, timeSeconds, targetEggs);
+
+        const multiplier = same ? accountCount : 1;
+        totalEggs += result.totalEggs * multiplier;
+        totalTime = calcMode === "time" ? timeSeconds : result.totalTime;
+
+        RARITY_LIST.forEach(r => {
+          totalRarityCounts[r.key] += result.rarityCounts[r.key] * multiplier;
+          totalVariantCounts[r.key].normal += result.variantCounts[r.key].normal * multiplier;
+          totalVariantCounts[r.key].golden += result.variantCounts[r.key].golden * multiplier;
+          totalVariantCounts[r.key].shiny += result.variantCounts[r.key].shiny * multiplier;
+          totalVariantCounts[r.key].rainbow += result.variantCounts[r.key].rainbow * multiplier;
+          totalVariantCounts[r.key].void += result.variantCounts[r.key].void * multiplier;
+        });
+      }
+
+      const eggsPerAccount = same ? (totalEggs / accountCount) : (totalEggs / Math.max(1, accountCount));
+
+      document.getElementById("summaryEggs").textContent = formatNumber(totalEggs, 2);
+      document.getElementById("summaryTime").textContent = formatDurationSeconds(totalTime);
+      document.getElementById("summaryPerAccount").textContent = formatNumber(eggsPerAccount, 2);
+
+      const note = resultMode === "simulation"
+        ? "Simulation mode adds randomness. Results can change every time you calculate."
+        : "Deterministic mode uses expected averages based on your inputs.";
+      document.getElementById("hatchNote").textContent = note;
+
+      document.getElementById("rarityTableWrap").innerHTML = renderRarityTable(totalRarityCounts, totalEggs);
+      document.getElementById("variantTableWrap").innerHTML = renderVariantTable(totalVariantCounts);
+    }
+
+    function setupToggleGroup(id, onChange){
+      const group = document.getElementById(id);
+      group.querySelectorAll(".toggle-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          group.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          onChange();
+        });
+      });
+    }
+
+    setupToggleGroup("calcMode", () => {
+      const mode = getCalcMode();
+      document.getElementById("timeInputs").classList.toggle("hidden", mode !== "time");
+      document.getElementById("eggInputs").classList.toggle("hidden", mode !== "eggs");
+      updateHatch();
+    });
+
+    setupToggleGroup("resultMode", updateHatch);
+
+    document.getElementById("accountCount").addEventListener("input", () => {
+      renderAccounts();
+      updateHatch();
+    });
+
+    document.getElementById("sameAccounts").addEventListener("change", () => {
+      renderAccounts();
+      updateHatch();
+    });
+
+    document.getElementById("timeInputs").addEventListener("input", updateHatch);
+    document.getElementById("eggInputs").addEventListener("input", updateHatch);
+
+    document.getElementById("accountsContainer").addEventListener("input", updateHatch);
+    document.getElementById("accountsContainer").addEventListener("change", updateHatch);
+
+    renderAccounts();
+    updateHatch();
 
     // Dailies
     const baseSuffixes=["","K","M","B","t","q","Q","s","S","o","n","d","U","D","T","Qt","Qd","Sd","St","O","N","v","c"];
